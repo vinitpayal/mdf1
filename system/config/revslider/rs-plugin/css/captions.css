@@ -524,3 +524,27 @@ border-color:rgb(34, 34, 34);
 border-style:none;
 }
 
+.tp-caption.shoes2_text_1 {
+font-size:50px;
+line-height:45px;
+font-weight:500;
+color:rgb(26, 25, 26);
+text-decoration:none;
+background-color:transparent;
+border-width:0px;
+border-color:rgb(34, 34, 34);
+border-style:none;
+}
+
+.tp-caption.petshop_text_2 {
+font-size:50px;
+line-height:50px;
+font-weight:300;
+color:rgb(247, 166, 29);
+text-decoration:none;
+background-color:transparent;
+border-width:0px;
+border-color:rgb(34, 34, 34);
+border-style:none;
+}
+

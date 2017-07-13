@@ -2,14 +2,14 @@
 /upload/.htaccess
 /upload/config.php
 /admin/config.php
-
 # Image File
 !/image/no_image.jpg
 
 # Image Cache Files
 /image/cache/*
+/image/
 !/image/cache/index.html
-
+/data_sample/
 # System Cache Files
 /system/storage/cache/*
 !/system/storage/cache/index.html
@@ -50,5 +50,7 @@
 # Test Config File
 /tests/phpunit/bootstrap.php
 
+/tests/
+/Files to upload/
 # IDE Project files
 /.idea

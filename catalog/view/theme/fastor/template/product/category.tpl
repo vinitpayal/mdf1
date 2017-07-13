@@ -12,9 +12,6 @@ include('catalog/view/theme/'.$config->get($config->get('config_theme') . '_dire
 <div id="mfilter-content-container">
   <?php if ($thumb || $description) { ?>
   <div class="category-info clearfix">
-    <?php if ($thumb) { ?>
-    <div class="image"><img src="<?php echo $thumb; ?>" alt="<?php echo $heading_title; ?>" /></div>
-    <?php } ?>
     <?php if ($description) { ?>
     <?php echo $description; ?>
     <?php } ?>

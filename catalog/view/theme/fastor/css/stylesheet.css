@@ -78,6 +78,20 @@ a:hover {
 	max-width: none !important;
 }
 
+.header-type-7 #top .pattern > .container {
+    padding-top: 5px;
+    padding-bottom: 0px;
+} 
+.header-type-7 #top .logo {
+    text-align: left;
+   padding-top: 0px;
+}
+
+.header-type-7 #top .pattern > .container {
+	padding-top: 5px;
+	padding-bottom: 30px;
+}
+
 body .standard-body,
 body .fixed-body {
      overflow: hidden;

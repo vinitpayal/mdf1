@@ -76,7 +76,7 @@ include('catalog/view/theme/' . $config->get($config->get('config_theme') . '_di
 <p style="padding-bottom: 10px"><?php echo $text_next_choice; ?></p>
 <div class="panel-group" id="accordion">
      <?php foreach ($modules as $module) { ?>
-     <?php echo $module; ?>
+      <?php echo $module; ?>
      <?php } ?>
 </div>
 <?php } ?>
