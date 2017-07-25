@@ -49,13 +49,19 @@ try {
 //    }
 
 
-    $result= $s3->listObjects(array("Bucket" => $bucket,"prefix" => "image","Delimiter" => "/"));
+    $result= $s3->listObjects(array("Bucket" => $bucket,"Prefix" => "image/","Delimiter" => "/"));
     $files = $result->getPath('Contents');
 
-    foreach ($result['CommonPrefixes'] as $object)
-    {
-        echo $object['Prefix'];
-    }
+    echo json_encode($result['CommonPrefixes']);die();
+
+//    foreach ($result['CommonPrefixes'] as $object)
+//    {
+//        echo $object['Prefix'];
+//    }
+
+    echo json_encode($files);
+
+
 }
 catch (\Exception $e){
     print_r($e);

@@ -2,6 +2,10 @@
 
 class ControllerCommonFileManager extends Controller {
 	public function index() {
+
+        $s3Client = getS3Client();
+        $s3Config = getS3Configs();
+
 		$this->load->language('common/filemanager');
 
 		// Find which protocol to use to pass the full image link back
@@ -19,9 +23,9 @@ class ControllerCommonFileManager extends Controller {
 
 		// Make sure we have the correct directory
 		if (isset($this->request->get['directory'])) {
-			$directory = rtrim(DIR_IMAGE . 'catalog/' . str_replace('*', '', $this->request->get['directory']), '/');
+			$directory = rtrim(RELATIVE_IMG_DIR . 'catalog/' . str_replace('*', '', $this->request->get['directory']), '/');
 		} else {
-			$directory = DIR_IMAGE . 'catalog';
+			$directory = RELATIVE_IMG_DIR . 'catalog';
 		}
 
 		if (isset($this->request->get['page'])) {
@@ -30,6 +34,14 @@ class ControllerCommonFileManager extends Controller {
 			$page = 1;
 		}
 
+        $s3Objects = $s3Client->listObjects(array(
+            "Bucket" => $s3Config["bucket-name"],
+            "prefix" => $directory . '/' . $filter_name,
+            "Delimiter" => "/"
+        ));
+
+        $files = $s3Objects->getPath('Contents');
+
 		$directories = array();
 		$files = array();
 
@@ -37,16 +49,20 @@ class ControllerCommonFileManager extends Controller {
 
 		$this->load->model('tool/image');
 
-		if (substr(str_replace('\\', '/', realpath($directory . '/' . $filter_name)), 0, strlen(DIR_IMAGE . 'catalog')) == DIR_IMAGE . 'catalog') {
+		if (substr(str_replace('\\', '/', $directory . '/' . $filter_name), 0, strlen(RELATIVE_IMG_DIR . 'catalog')) == RELATIVE_IMG_DIR . 'catalog') {
 			// Get directories
-			$directories = glob($directory . '/' . $filter_name . '*', GLOB_ONLYDIR);
+//			$directories = glob($directory . '/' . $filter_name . '*', GLOB_ONLYDIR);
+
+            foreach ($s3Objects['CommonPrefixes'] as $object) {
+                array_push($directories,$object['Prefix']);
+            }
 
 			if (!$directories) {
 				$directories = array();
 			}
 
 			// Get files
-			$files = glob($directory . '/' . $filter_name . '*.{jpg,jpeg,png,gif,JPG,JPEG,PNG,GIF}', GLOB_BRACE);
+//			$files = glob($directory . '/' . $filter_name . '*.{jpg,jpeg,png,gif,JPG,JPEG,PNG,GIF}', GLOB_BRACE);
 
 			if (!$files) {
 				$files = array();
@@ -63,9 +79,21 @@ class ControllerCommonFileManager extends Controller {
 		$images = array_splice($images, ($page - 1) * 16, 16);
 
 		foreach ($images as $image) {
-			$name = str_split(basename($image), 14);
 
-			if (is_dir($image)) {
+		    $name = str_split(basename($image), 14);
+
+			if($s3Client->doesObjectExist($s3Config['bucket-name'],$image)){
+			    echo 'is a image';
+                $data['images'][] = array(
+                    'thumb' => $this->model_tool_image->resize(utf8_substr($image, utf8_strlen(DIR_IMAGE)), 100, 100),
+                    'name'  => implode(' ', $name),
+                    'type'  => 'image',
+                    'path'  => utf8_substr($image, utf8_strlen(DIR_IMAGE)),
+                    'href'  => $server . 'image/' . utf8_substr($image, utf8_strlen(DIR_IMAGE))
+                );
+            }
+			else {
+			    echo 'is a directory';
 				$url = '';
 
 				if (isset($this->request->get['target'])) {
@@ -82,14 +110,6 @@ class ControllerCommonFileManager extends Controller {
 					'type'  => 'directory',
 					'path'  => utf8_substr($image, utf8_strlen(DIR_IMAGE)),
 					'href'  => $this->url->link('common/filemanager', 'token=' . $this->session->data['token'] . '&directory=' . urlencode(utf8_substr($image, utf8_strlen(DIR_IMAGE . 'catalog/'))) . $url, true)
-				);
-			} elseif (is_file($image)) {
-				$data['images'][] = array(
-					'thumb' => $this->model_tool_image->resize(utf8_substr($image, utf8_strlen(DIR_IMAGE)), 100, 100),
-					'name'  => implode(' ', $name),
-					'type'  => 'image',
-					'path'  => utf8_substr($image, utf8_strlen(DIR_IMAGE)),
-					'href'  => $server . 'image/' . utf8_substr($image, utf8_strlen(DIR_IMAGE))
 				);
 			}
 		}
