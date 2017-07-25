@@ -1,47 +1,39 @@
 <?php
 class ModelToolImage extends Model {
 	public function resize($filename, $width, $height) {
-		if (!is_file(DIR_IMAGE . $filename) || substr(str_replace('\\', '/', realpath(DIR_IMAGE . $filename)), 0, strlen(DIR_IMAGE)) != DIR_IMAGE) {
-			return;
-		}
+        $s3Client = getS3Client();
+        $s3Config = getS3Configs();
 
-		$extension = pathinfo($filename, PATHINFO_EXTENSION);
+        if (!$s3Client->doesObjectExist($s3Config['bucket-name'], RELATIVE_IMG_DIR.$filename)) {
+            return;
+        }
 
-		$image_old = $filename;
-		$image_new = 'cache/' . utf8_substr($filename, 0, utf8_strrpos($filename, '.')) . '-' . $width . 'x' . $height . '.' . $extension;
+        $extension = pathinfo($filename, PATHINFO_EXTENSION);
 
-		if (!is_file(DIR_IMAGE . $image_new) || (filectime(DIR_IMAGE . $image_old) > filectime(DIR_IMAGE . $image_new))) {
-			list($width_orig, $height_orig, $image_type) = getimagesize(DIR_IMAGE . $image_old);
-				 
-			if (!in_array($image_type, array(IMAGETYPE_PNG, IMAGETYPE_JPEG, IMAGETYPE_GIF))) { 
-				return DIR_IMAGE . $image_old;
-			}
- 
-			$path = '';
+        $image_old = $filename;
+        $image_new = 'cache/' . utf8_substr($filename, 0, utf8_strrpos($filename, '.')) . '-' . (int)$width . 'x' . (int)$height . '.' . $extension;
 
-			$directories = explode('/', dirname($image_new));
+        //@todo Handle image modification time for cache image if image is changed then update it's cache also
+        //|| (filectime(DIR_IMAGE . $image_old) > filectime(DIR_IMAGE . $image_new))
 
-			foreach ($directories as $directory) {
-				$path = $path . '/' . $directory;
+        if (!$s3Client->doesObjectExist($s3Config['bucket-name'], RELATIVE_IMG_DIR.$image_new)) {
+            list($width_orig, $height_orig, $image_type) = getimagesize(DIR_IMAGE . $image_old);
+            if (!in_array($image_type, array(IMAGETYPE_PNG, IMAGETYPE_JPEG, IMAGETYPE_GIF))) {
+                return DIR_IMAGE . $image_old;
+            }
 
-				if (!is_dir(DIR_IMAGE . $path)) {
-					@mkdir(DIR_IMAGE . $path, 0777);
-				}
-			}
+            if ($width_orig != $width || $height_orig != $height) {
+                $image = new Image(DIR_IMAGE . $image_old);
+                $image->resize($width, $height);
+                $image->save(RELATIVE_IMG_DIR . $image_new);
+            } else {
+                $image = new Image(RELATIVE_IMG_DIR . $image_old);
+                $image->save(RELATIVE_IMG_DIR . $image_new);
+            }
+        }
 
-			if ($width_orig != $width || $height_orig != $height) {
-				$image = new Image(DIR_IMAGE . $image_old);
-				$image->resize($width, $height);
-				$image->save(DIR_IMAGE . $image_new);
-			} else {
-				copy(DIR_IMAGE . $image_old, DIR_IMAGE . $image_new);
-			}
-		}
+        $image_new = str_replace(' ', '%20', $image_new);  // fix bug when attach image on email (gmail.com). it is automatic changing space " " to +
 
-		if ($this->request->server['HTTPS']) {
-			return HTTPS_CATALOG . 'image/' . $image_new;
-		} else {
-			return HTTP_CATALOG . 'image/' . $image_new;
-		}
+        return DIR_IMAGE . $image_new;
 	}
 }
