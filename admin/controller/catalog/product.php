@@ -1228,8 +1228,11 @@ class ControllerCatalogProduct extends Controller {
 
 		$data['product_images'] = array();
 
+        $s3Client = getS3Client();
+        $s3Config = getS3Configs();
+
 		foreach ($product_images as $product_image) {
-			if (is_file(DIR_IMAGE . $product_image['image'])) {
+			if ($s3Client->doesObjectExist($s3Config['bucket-name'], RELATIVE_IMG_DIR.$product_image['image'])) {
 				$image = $product_image['image'];
 				$thumb = $product_image['image'];
 			} else {
@@ -1243,7 +1246,6 @@ class ControllerCatalogProduct extends Controller {
 				'sort_order' => $product_image['sort_order']
 			);
 		}
-
 		// Downloads
 		$this->load->model('catalog/download');
 
