@@ -7,7 +7,6 @@ class ModelToolImage extends Model {
         if (!$s3Client->doesObjectExist($s3Config['bucket-name'], RELATIVE_IMG_DIR.$filename)) {
             return;
         }
-
         $extension = pathinfo($filename, PATHINFO_EXTENSION);
 
         $image_old = $filename;
@@ -19,11 +18,11 @@ class ModelToolImage extends Model {
         if (!$s3Client->doesObjectExist($s3Config['bucket-name'], RELATIVE_IMG_DIR.$image_new)) {
             list($width_orig, $height_orig, $image_type) = getimagesize(DIR_IMAGE . $image_old);
             if (!in_array($image_type, array(IMAGETYPE_PNG, IMAGETYPE_JPEG, IMAGETYPE_GIF))) {
-                return DIR_IMAGE . $image_old;
+                return  DIR_IMAGE.$image_old;
             }
 
             if ($width_orig != $width || $height_orig != $height) {
-                $image = new Image(DIR_IMAGE . $image_old);
+                $image = new Image(RELATIVE_IMG_DIR.$image_old);
                 $image->resize($width, $height);
                 $image->save(RELATIVE_IMG_DIR . $image_new);
             } else {
