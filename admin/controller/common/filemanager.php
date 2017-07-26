@@ -36,11 +36,15 @@ class ControllerCommonFileManager extends Controller {
 
         $s3Objects = $s3Client->listObjects(array(
             "Bucket" => $s3Config["bucket-name"],
-            "prefix" => $directory . '/' . $filter_name,
+            "Prefix" => $directory . '/' . $filter_name,
             "Delimiter" => "/"
         ));
 
-        $files = $s3Objects->getPath('Contents');
+        $filesObject = $s3Client->getIterator('ListObjects', array(
+            "Bucket" => $s3Config["bucket-name"],
+            "Prefix" => $directory . '/' . $filter_name,
+            "Delimiter" => '/'
+        ));
 
 		$directories = array();
 		$files = array();
@@ -57,12 +61,13 @@ class ControllerCommonFileManager extends Controller {
                 array_push($directories,$object['Prefix']);
             }
 
+            foreach ($filesObject as $object) {
+                array_push($files, $object['Key']);
+            }
+
 			if (!$directories) {
 				$directories = array();
 			}
-
-			// Get files
-//			$files = glob($directory . '/' . $filter_name . '*.{jpg,jpeg,png,gif,JPG,JPEG,PNG,GIF}', GLOB_BRACE);
 
 			if (!$files) {
 				$files = array();
@@ -77,15 +82,17 @@ class ControllerCommonFileManager extends Controller {
 
 		// Split the array based on current page number and max number of items per page of 10
 		$images = array_splice($images, ($page - 1) * 16, 16);
-
 		foreach ($images as $image) {
 
 		    $name = str_split(basename($image), 14);
 
 			if($s3Client->doesObjectExist($s3Config['bucket-name'],$image)){
-			    echo 'is a image';
+//			    echo 'is a image';
+//                echo 'thumb for image '.$image." is ".$this->model_tool_image->resize("catalog/1_akhrot.png", 100, 100);die();
+                $image = str_replace(RELATIVE_IMG_DIR, "", $image);
+
                 $data['images'][] = array(
-                    'thumb' => $this->model_tool_image->resize(utf8_substr($image, utf8_strlen(DIR_IMAGE)), 100, 100),
+                    'thumb' => $this->model_tool_image->resize($image, 100, 100),
                     'name'  => implode(' ', $name),
                     'type'  => 'image',
                     'path'  => utf8_substr($image, utf8_strlen(DIR_IMAGE)),
@@ -93,7 +100,7 @@ class ControllerCommonFileManager extends Controller {
                 );
             }
 			else {
-			    echo 'is a directory';
+//			    echo 'is a directory';
 				$url = '';
 
 				if (isset($this->request->get['target'])) {
@@ -108,12 +115,13 @@ class ControllerCommonFileManager extends Controller {
 					'thumb' => '',
 					'name'  => implode(' ', $name),
 					'type'  => 'directory',
-					'path'  => utf8_substr($image, utf8_strlen(DIR_IMAGE)),
+					'path'  => $image,
 					'href'  => $this->url->link('common/filemanager', 'token=' . $this->session->data['token'] . '&directory=' . urlencode(utf8_substr($image, utf8_strlen(DIR_IMAGE . 'catalog/'))) . $url, true)
 				);
 			}
 		}
 
+//		echo json_encode($data['images']);die();
 		$data['heading_title'] = $this->language->get('heading_title');
 
 		$data['text_no_results'] = $this->language->get('text_no_results');
