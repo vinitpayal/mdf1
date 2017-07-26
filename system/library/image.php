@@ -8,6 +8,7 @@ class Image {
 	private $mime;
 
 	public function __construct($file) {
+		//echo $file; die();
 		if (checkRemoteFileExistence($file)) {
 			$this->file = $file;
 
