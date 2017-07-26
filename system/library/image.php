@@ -79,10 +79,9 @@ class Image {
                 $image_contents = ob_get_clean();
 			}
 
-            $s3Client->upload($s3Config['bucket-name'], $file, $image_contents, 'public-read',
+            $uploadStatus = $s3Client->upload($s3Config['bucket-name'], $file, $image_contents, 'public-read',
                 array( 'params' => array('ContentType' => 'image/'.$extension))
             );
-
 			imagedestroy($this->image);
 		}
 	}

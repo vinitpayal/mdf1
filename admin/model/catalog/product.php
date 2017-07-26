@@ -407,8 +407,7 @@ class ModelCatalogProduct extends Model {
 		}
 
 		$query = $this->db->query($sql);
-
-		return $query->rows;
+        return $query->rows;
 	}
 
 	public function getProductsByCategoryId($category_id) {

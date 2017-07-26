@@ -225,6 +225,9 @@ class ControllerCatalogProduct extends Controller {
 	}
 
 	protected function getList() {
+        $s3Client = getS3Client();
+        $s3Config = getS3Configs();
+
 		if (isset($this->request->get['filter_name'])) {
 			$filter_name = $this->request->get['filter_name'];
 		} else {
@@ -355,7 +358,7 @@ class ControllerCatalogProduct extends Controller {
 		$results = $this->model_catalog_product->getProducts($filter_data);
 
 		foreach ($results as $result) {
-			if (is_file(DIR_IMAGE . $result['image'])) {
+			if ($s3Client->doesObjectExist($s3Config['bucket-name'],RELATIVE_IMG_DIR.$result['image'])) {
 				$image = $this->model_tool_image->resize($result['image'], 40, 40);
 			} else {
 				$image = $this->model_tool_image->resize('no_image.png', 40, 40);
@@ -1225,8 +1228,11 @@ class ControllerCatalogProduct extends Controller {
 
 		$data['product_images'] = array();
 
+        $s3Client = getS3Client();
+        $s3Config = getS3Configs();
+
 		foreach ($product_images as $product_image) {
-			if (is_file(DIR_IMAGE . $product_image['image'])) {
+			if ($s3Client->doesObjectExist($s3Config['bucket-name'], RELATIVE_IMG_DIR.$product_image['image'])) {
 				$image = $product_image['image'];
 				$thumb = $product_image['image'];
 			} else {
@@ -1240,7 +1246,6 @@ class ControllerCatalogProduct extends Controller {
 				'sort_order' => $product_image['sort_order']
 			);
 		}
-
 		// Downloads
 		$this->load->model('catalog/download');
 
