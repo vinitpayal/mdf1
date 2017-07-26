@@ -1,12 +1,12 @@
 <?php
 // HTTP
 // /home/vinit/personal-stuff
-define('HTTP_SERVER', 'http://local.mdf.com/admin/');
-define('HTTP_CATALOG', 'http://local.mdf.com/admin/');
+define('HTTP_SERVER', 'http://mydryfood.com/admin/');
+define('HTTP_CATALOG', 'http://mydryfood.com/admin/');
 
 // HTTPS
-define('HTTPS_SERVER', 'http://local.mdf.com/admin/');
-define('HTTPS_CATALOG', 'http://local.mdf.com/admin/');
+define('HTTPS_SERVER', 'http://mydryfood.com/admin/');
+define('HTTPS_CATALOG', 'http://mydryfood.com/admin/');
 
 // DIR
 define('BASE_S3_URL','https://mdf-images.s3.amazonaws.com/');
