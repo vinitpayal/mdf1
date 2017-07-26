@@ -44,5 +44,5 @@ function getS3Client(){
 }
 
 function checkRemoteFileExistence($filePath){
-    return @getimagesize(BASE_S3_URL.$filePath);
+    return @getimagesize($filePath);
 }

@@ -8,11 +8,10 @@ class Image {
 	private $mime;
 
 	public function __construct($file) {
-		//echo $file; die();
-		if (checkRemoteFileExistence($file)) {
+		if (checkRemoteFileExistence(BASE_S3_URL.$file)) {
 			$this->file = $file;
 
-			$info = getimagesize($file);
+			$info = getimagesize(BASE_S3_URL.$file);
 
 			$this->width  = $info[0];
 			$this->height = $info[1];
@@ -20,11 +19,11 @@ class Image {
 			$this->mime = isset($info['mime']) ? $info['mime'] : '';
 
 			if ($this->mime == 'image/gif') {
-				$this->image = imagecreatefromgif($file);
+				$this->image = imagecreatefromgif(BASE_S3_URL.$file);
 			} elseif ($this->mime == 'image/png') {
-				$this->image = imagecreatefrompng($file);
+				$this->image = imagecreatefrompng(BASE_S3_URL.$file);
 			} elseif ($this->mime == 'image/jpeg') {
-				$this->image = imagecreatefromjpeg($file);
+				$this->image = imagecreatefromjpeg(BASE_S3_URL.$file);
 			}
 		} else {
 			exit('Error: Could not load image ' . $file . '!');
@@ -58,7 +57,6 @@ class Image {
 	public function save($file, $quality = 90) {
 	    $s3Client = getS3Client();
 	    $s3Config = getS3Configs();
-
         $info = pathinfo($file);
 
 		$extension = strtolower($info['extension']);
