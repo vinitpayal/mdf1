@@ -2,7 +2,6 @@
 
 class ControllerCommonFileManager extends Controller {
 	public function index() {
-
         $s3Client = getS3Client();
         $s3Config = getS3Configs();
 
@@ -23,7 +22,8 @@ class ControllerCommonFileManager extends Controller {
 
 		// Make sure we have the correct directory
 		if (isset($this->request->get['directory'])) {
-			$directory = rtrim(RELATIVE_IMG_DIR . 'catalog/' . str_replace('*', '', $this->request->get['directory']), '/');
+//			$directory = rtrim(RELATIVE_IMG_DIR . 'catalog/' . str_replace('*', '', $this->request->get['directory']), '/');
+            $directory = rtrim(str_replace('\\', '', $this->request->get['directory']));
 		} else {
 			$directory = RELATIVE_IMG_DIR . 'catalog';
 		}
@@ -36,13 +36,13 @@ class ControllerCommonFileManager extends Controller {
 
         $s3Objects = $s3Client->listObjects(array(
             "Bucket" => $s3Config["bucket-name"],
-            "Prefix" => $directory . '/' . $filter_name,
+            "Prefix" =>  str_replace("//",",",$directory . '/' . $filter_name),
             "Delimiter" => "/"
         ));
 
         $filesObject = $s3Client->getIterator('ListObjects', array(
             "Bucket" => $s3Config["bucket-name"],
-            "Prefix" => $directory . '/' . $filter_name,
+            "Prefix" => str_replace("//","/",$directory . '/' . $filter_name),
             "Delimiter" => '/'
         ));
 
@@ -56,15 +56,15 @@ class ControllerCommonFileManager extends Controller {
 		if (substr(str_replace('\\', '/', $directory . '/' . $filter_name), 0, strlen(RELATIVE_IMG_DIR . 'catalog')) == RELATIVE_IMG_DIR . 'catalog') {
 			// Get directories
 //			$directories = glob($directory . '/' . $filter_name . '*', GLOB_ONLYDIR);
-
-            foreach ($s3Objects['CommonPrefixes'] as $object) {
-                array_push($directories,$object['Prefix']);
+            if($s3Objects['CommonPrefixes']) {
+                foreach ($s3Objects['CommonPrefixes'] as $object) {
+                    array_push($directories, $object['Prefix']);
+                }
             }
 
             foreach ($filesObject as $object) {
                 array_push($files, $object['Key']);
             }
-
 			if (!$directories) {
 				$directories = array();
 			}
@@ -87,7 +87,7 @@ class ControllerCommonFileManager extends Controller {
 		    $name = str_split(basename($image), 14);
 
 			if($s3Client->doesObjectExist($s3Config['bucket-name'],$image)){
-//			    echo 'is a image';
+
 //                echo 'thumb for image '.$image." is ".$this->model_tool_image->resize("catalog/1_akhrot.png", 100, 100);die();
                 $image = str_replace(RELATIVE_IMG_DIR, "", $image);
 
@@ -116,8 +116,10 @@ class ControllerCommonFileManager extends Controller {
 					'name'  => implode(' ', $name),
 					'type'  => 'directory',
 					'path'  => $image,
-					'href'  => $this->url->link('common/filemanager', 'token=' . $this->session->data['token'] . '&directory=' . urlencode(utf8_substr($image, utf8_strlen(DIR_IMAGE . 'catalog/'))) . $url, true)
+					'href'  => $this->url->link('common/filemanager', 'token=' . $this->session->data['token'] . '&directory=' . $image. $url, true)
 				);
+
+//				echo json_encode($data['images']);
 			}
 		}
 
@@ -228,7 +230,6 @@ class ControllerCommonFileManager extends Controller {
 		$pagination->url = $this->url->link('common/filemanager', 'token=' . $this->session->data['token'] . $url . '&page={page}', true);
 
 		$data['pagination'] = $pagination->render();
-
 		$this->response->setOutput($this->load->view('common/filemanager', $data));
 	}
 
