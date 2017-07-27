@@ -353,15 +353,10 @@ class ControllerCommonFileManager extends Controller {
 
             // Make sure we have the correct directory
             if (isset($this->request->get['directory'])) {
-                $directory = rtrim(DIR_IMAGE . 'catalog/' . $this->request->get['directory'], '/');
+                $directory = rtrim( $this->request->get['directory'], '/');
             } else {
-                $directory = DIR_IMAGE . 'catalog';
+                $directory = 'image/catalog';
             }
-
-            // Check its a directory
-//            if (!is_dir($directory) || substr(str_replace('\\', '/', realpath($directory)), 0, strlen(DIR_IMAGE . 'catalog')) != DIR_IMAGE . 'catalog') {
-//                $json['error'] = $this->language->get('error_directory');
-//            }
 
             if ($this->request->server['REQUEST_METHOD'] == 'POST') {
                 // Sanitize the folder name
@@ -377,11 +372,6 @@ class ControllerCommonFileManager extends Controller {
                 if($folderExistsInS3){
                     $json['error'] = $this->language->get('error_exists');
                 }
-
-                // Check if directory already exists or not
-//                if (is_dir($directory . '/' . $folder)) {
-//                    $json['error'] = $this->language->get('error_exists');
-//                }
             }
 
             if (!isset($json['error'])) {
@@ -392,10 +382,6 @@ class ControllerCommonFileManager extends Controller {
                     'ACL'          => 'public-read',
                     'ContentLength' => 0
                 ));
-
-//                mkdir($directory . '/' . $folder, 0777);
-//                chmod($directory . '/' . $folder, 0777);
-//                @touch($directory . '/' . $folder . '/' . 'index.html');
 
                 $json['success'] = $this->language->get('text_directory');
             }
