@@ -90,19 +90,16 @@ class ControllerCommonFileManager extends Controller {
 
 //                echo 'thumb for image '.$image." is ".$this->model_tool_image->resize("catalog/1_akhrot.png", 100, 100);die();
                 $image = str_replace(RELATIVE_IMG_DIR, "", $image);
-
                 $data['images'][] = array(
                     'thumb' => $this->model_tool_image->resize($image, 100, 100),
                     'name'  => implode(' ', $name),
                     'type'  => 'image',
-                    'path'  => utf8_substr($image, utf8_strlen(DIR_IMAGE)),
+                    'path'  => $image,
                     'href'  => $server . 'image/' . utf8_substr($image, utf8_strlen(DIR_IMAGE))
                 );
             }
 			else {
-//			    echo 'is a directory';
 				$url = '';
-
 				if (isset($this->request->get['target'])) {
 					$url .= '&target=' . $this->request->get['target'];
 				}

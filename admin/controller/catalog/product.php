@@ -68,7 +68,6 @@ class ControllerCatalogProduct extends Controller {
 		$this->load->language('catalog/product');
 
 		$this->document->setTitle($this->language->get('heading_title'));
-
 		$this->load->model('catalog/product');
 
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validateForm()) {
@@ -1207,9 +1206,9 @@ class ControllerCatalogProduct extends Controller {
 
 		$this->load->model('tool/image');
 
-		if (isset($this->request->post['image']) && is_file(DIR_IMAGE . $this->request->post['image'])) {
+		if (isset($this->request->post['image']) && checkRemoteFileExistence(DIR_IMAGE . $this->request->post['image'])) {
 			$data['thumb'] = $this->model_tool_image->resize($this->request->post['image'], 100, 100);
-		} elseif (!empty($product_info) && is_file(DIR_IMAGE . $product_info['image'])) {
+		} elseif (!empty($product_info) && checkRemoteFileExistence(DIR_IMAGE . $product_info['image'])) {
 			$data['thumb'] = $this->model_tool_image->resize($product_info['image'], 100, 100);
 		} else {
 			$data['thumb'] = $this->model_tool_image->resize('no_image.png', 100, 100);
@@ -1230,22 +1229,22 @@ class ControllerCatalogProduct extends Controller {
 
         $s3Client = getS3Client();
         $s3Config = getS3Configs();
-
 		foreach ($product_images as $product_image) {
-			if ($s3Client->doesObjectExist($s3Config['bucket-name'], RELATIVE_IMG_DIR.$product_image['image'])) {
-				$image = $product_image['image'];
-				$thumb = $product_image['image'];
-			} else {
-				$image = '';
-				$thumb = 'no_image.png';
-			}
+            if(true || checkRemoteFileExistence(DIR_IMAGE.$product_image['image'])){
+                $image = $product_image['image'];
+                $thumb = $product_image['image'];
+            }
+            else {
+                $image = '';
+                $thumb = 'no_image.png';
+            }
 
 			$data['product_images'][] = array(
 				'image'      => $image,
 				'thumb'      => $this->model_tool_image->resize($thumb, 100, 100),
 				'sort_order' => $product_image['sort_order']
 			);
-		}
+        }
 		// Downloads
 		$this->load->model('catalog/download');
 
