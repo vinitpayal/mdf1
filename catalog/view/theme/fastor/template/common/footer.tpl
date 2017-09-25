@@ -258,7 +258,7 @@ if($registry->has('theme_options') == true) {
      						</div>
      						
      						<!-- Extras -->
-     						<div class="col-sm-<?php echo $span; ?>">
+     						<div style="display:none;"class="col-sm-<?php echo $span; ?>">
      							<h4><?php echo $text_extra; ?></h4>
      							<div class="strip-line"></div>
      							<ul>

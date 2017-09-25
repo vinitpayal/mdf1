@@ -1,13 +1,13 @@
 <?php
 // HTTP
-define('HTTP_SERVER', 'http://local.mdf.com/');
+define('HTTP_SERVER', 'http://mydryfood.com/');
 
 // HTTPS
-define('HTTPS_SERVER', 'http://local.mdf.com/');
+define('HTTPS_SERVER', 'http://mydryfood.com/');
 
 // DIR
 define('BASE_S3_URL','https://mdf-images.s3.amazonaws.com/');
-define('BASE_DIR','/home/vinit/personal-stuff/mdf1/');
+define('BASE_DIR','/var/www/html/mdf1/');
 define('DIR_APPLICATION', BASE_DIR.'catalog/');
 define('DIR_SYSTEM', BASE_DIR.'system/');
 define('DIR_IMAGE', BASE_S3_URL.'image/');

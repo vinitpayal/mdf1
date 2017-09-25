@@ -10,7 +10,7 @@ define('HTTPS_CATALOG', 'http://mydryfood.com/admin/');
 
 // DIR
 define('BASE_S3_URL','https://mdf-images.s3.amazonaws.com/');
-define('BASE_DIR','/home/vinit/personal-stuff/mdf1/');
+define('BASE_DIR','/var/www/html/mdf1/');
 define('DIR_APPLICATION', BASE_DIR.'admin/');
 define('DIR_SYSTEM', BASE_DIR.'system/');
 define('DIR_IMAGE', BASE_S3_URL.'image/');
